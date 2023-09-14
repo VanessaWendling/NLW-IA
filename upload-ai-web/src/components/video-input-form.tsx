@@ -17,7 +17,11 @@ const statusMessages = {
   success: "Sucesso!",
 };
 
-export const VideoInputForm = () => {
+interface VideoInputFormProps {
+  onVideoUploaded: (id: string) => void;
+}
+
+export const VideoInputForm = (props: VideoInputFormProps) => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [status, setStatus] = useState<Status>("waiting");
   const promptInputRef = useRef<HTMLTextAreaElement>(null);
@@ -87,6 +91,8 @@ export const VideoInputForm = () => {
     setStatus("generating");
     await api.post(`/videos/${videoId}/transcription`, { prompt });
     setStatus("success");
+
+    props.onVideoUploaded(videoId);
   }
 
   return (
@@ -128,11 +134,12 @@ export const VideoInputForm = () => {
           placeholder="Inclua palavras-chave mencionadas no vídeo separadas por vírgula (,)"
         />
       </div>
-      <Button 
-      data-success={status == 'success'}
-      type="submit"
-       className="w-full data-[success=true]:bg-violet-500" 
-       disabled={status != "waiting"}>
+      <Button
+        data-success={status == "success"}
+        type="submit"
+        className="w-full data-[success=true]:bg-violet-500"
+        disabled={status != "waiting"}
+      >
         {status == "waiting" ? (
           <>
             Carregar vídio
